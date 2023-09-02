@@ -11,44 +11,44 @@
     </div>
 
     <script>
-        // Create a random ID for the user
-        const userId = Math.random().toString(36).substring(2, 15);
+        const chatBox = document.getElementById('chat-box');
+        const messageInput = document.getElementById('message');
 
-        // Array to store chat messages
-        const messages = [];
-
-        // Function to render messages in the chat box
-        function renderMessages() {
-            const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML = '';
-            messages.forEach((message) => {
-                const messageDiv = document.createElement('div');
-                messageDiv.textContent = message;
-                chatBox.appendChild(messageDiv);
-            });
+        // Function to display messages in the chat box
+        function displayMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            chatBox.appendChild(messageDiv);
         }
 
         // Function to send a new message
         function sendMessage() {
-            const messageInput = document.getElementById('message');
             const message = messageInput.value.trim();
-            
             if (message !== '') {
-                messages.push(`User ${userId}: ${message}`);
+                const formattedMessage = `User: ${message}`;
+                displayMessage(formattedMessage);
                 messageInput.value = '';
-                renderMessages();
             }
         }
 
         // Listen for Enter key press to send a message
-        document.getElementById('message').addEventListener('keydown', function (e) {
+        messageInput.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
 
-        // Initial rendering of messages
-        renderMessages();
+        // Simulate receiving messages from other users (for demonstration purposes)
+        setInterval(function () {
+            const messages = [
+                "Hello there!",
+                "How's it going?",
+                "This is a simple chat example."
+            ];
+
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            displayMessage(`Anonymous: ${randomMessage}`);
+        }, 3000); // Simulate a new message every 3 seconds
     </script>
 </body>
 </html>
