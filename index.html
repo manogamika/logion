@@ -1,78 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+    <title>Simple Chatroom</title>
 </head>
 <body>
-    <div id="chat">
-        <div id="messages"></div>
-        <input type="text" id="messageInput" placeholder="Type your message">
-        <button onclick="sendMessage()">Send</button>
+    <div id="chatbox">
+        <div id="chat"></div>
     </div>
+    <input type="text" id="message" placeholder="Type your message..." />
+    <button id="send">Send</button>
 
     <script>
-        const messagesDiv = document.getElementById('messages');
-        const messageInput = document.getElementById('messageInput');
-        const serverUrl = 'ws://localhost:8080'; // Replace with your server's URL
+        const chatBox = document.getElementById("chat");
+        const messageInput = document.getElementById("message");
+        const sendButton = document.getElementById("send");
 
-        // Create a WebSocket connection to the server
-        const socket = new WebSocket(serverUrl);
-
-        // Handle incoming messages from the server
-        socket.addEventListener('message', (event) => {
-            const message = event.data;
-            messagesDiv.innerHTML += `<p>${message}</p>`;
-        });
-
-        // Function to send a message to the server
-        function sendMessage() {
-            const message = messageInput.value;
-            socket.send(message);
-            messageInput.value = '';
+        // Function to add a message to the chatbox
+        function addMessage(message) {
+            const messageDiv = document.createElement("div");
+            messageDiv.textContent = message;
+            chatBox.appendChild(messageDiv);
         }
-    </script>
 
-    <script>
-        const WebSocket = require('ws');
-        const server = new WebSocket.Server({ noServer: true });
+        // Event listener for the send button
+        sendButton.addEventListener("click", function () {
+            const message = messageInput.value.trim();
 
-        // Handle WebSocket connections
-        server.on('connection', (socket) => {
-            console.log('Client connected');
+            if (message !== "") {
+                addMessage("User 1: " + message);
+                messageInput.value = "";
 
-            // Handle incoming messages from clients
-            socket.on('message', (message) => {
-                console.log(`Received: ${message}`);
-
-                // Broadcast the message to all connected clients (excluding sender)
-                server.clients.forEach((client) => {
-                    if (client !== socket && client.readyState === WebSocket.OPEN) {
-                        client.send(message);
-                    }
-                });
-            });
-
-            // Handle client disconnection
-            socket.on('close', () => {
-                console.log('Client disconnected');
-            });
-        });
-
-        // Attach the WebSocket server to an HTTP server (for demonstration purposes)
-        const http = require('http');
-        const httpServer = http.createServer((req, res) => {
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('WebSocket server running');
-        });
-
-        httpServer.on('upgrade', (request, socket, head) => {
-            server.handleUpgrade(request, socket, head, (ws) => {
-                server.emit('connection', ws, request);
-            });
-        });
-
-        httpServer.listen(8080, () => {
-            console.log('WebSocket server listening on port 8080');
+                // Simulate a reply (user 2) after a delay
+                setTimeout(function () {
+                    const reply = "User 2: Hi, you said: " + message;
+                    addMessage(reply);
+                }, 1000);
+            }
         });
     </script>
 </body>
