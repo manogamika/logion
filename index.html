@@ -4,39 +4,48 @@
 
 </head>
 <body>
-    <div id="chatbox">
-        <div id="chat"></div>
+    <div id="chat">
+        <div id="chat-box"></div>
+        <input type="text" id="message" placeholder="Type your message..." />
+        <button onclick="sendMessage()">Send</button>
     </div>
-    <input type="text" id="message" placeholder="Type your message..." />
-    <button id="send">Send</button>
 
     <script>
-        const chatBox = document.getElementById("chat");
-        const messageInput = document.getElementById("message");
-        const sendButton = document.getElementById("send");
+        // Array to store chat messages
+        const messages = [];
 
-        // Function to add a message to the chatbox
-        function addMessage(message) {
-            const messageDiv = document.createElement("div");
-            messageDiv.textContent = message;
-            chatBox.appendChild(messageDiv);
+        // Function to render messages in the chat box
+        function renderMessages() {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = '';
+            messages.forEach((message) => {
+                const messageDiv = document.createElement('div');
+                messageDiv.textContent = message;
+                chatBox.appendChild(messageDiv);
+            });
         }
 
-        // Event listener for the send button
-        sendButton.addEventListener("click", function () {
+        // Function to send a new message
+        function sendMessage() {
+            const messageInput = document.getElementById('message');
             const message = messageInput.value.trim();
+            
+            if (message !== '') {
+                messages.push(message);
+                messageInput.value = '';
+                renderMessages();
+            }
+        }
 
-            if (message !== "") {
-                addMessage("User 1: " + message);
-                messageInput.value = "";
-
-                // Simulate a reply (user 2) after a delay
-                setTimeout(function () {
-                    const reply = "User 2: Hi, you said: " + message;
-                    addMessage(reply);
-                }, 1000);
+        // Listen for Enter key press to send a message
+        document.getElementById('message').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
             }
         });
+
+        // Initial rendering of messages
+        renderMessages();
     </script>
 </body>
 </html>
