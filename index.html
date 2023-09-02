@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Anonymous Chat</title>
+    <title>Language Education Chat</title>
 </head>
 <body>
     <div id="chat">
@@ -9,26 +9,85 @@
         <input type="text" id="message" placeholder="Type your message..." />
         <button onclick="sendMessage()">Send</button>
     </div>
-
+    <audio id="messageSound" src="c.mp3"></audio>
     <script>
+
         const chatBox = document.getElementById('chat-box');
         const messageInput = document.getElementById('message');
+        let isPaused = false;
 
-        // Function to display messages in the chat box
-        function displayMessage(message) {
+        // Conversation patterns and responses for the stranger
+        const conversationPatterns = [
+            { pattern: /hello|hi|hey/i, response: "Hello there!" },
+            { pattern: /how are you|how's it going|what's up/i, response: "I'm good, thanks!" },
+            { pattern: /tell me a joke|joke/i, response: "Why did the chicken cross the road? To get to the other side!" },
+            { pattern: /bye|goodbye|see you/i, response: "Goodbye! Have a great day!" },
+            { pattern: /stop/i, response: "Ok boomer", pause: true },
+            { pattern: /halo/i, response: "hello" }, // Added pattern for "halo"
+            // Add more patterns and responses here
+        ];
+
+        // Function to display messages in the chat box and play a sound
+        function displayMessage(message, isSelfbotMessage) {
             const messageDiv = document.createElement('div');
             messageDiv.textContent = message;
             chatBox.appendChild(messageDiv);
+
+            // Play the message sound only if it's not a selfbot message
+            if (!isSelfbotMessage) {
+                playMessageSound();
+            }
         }
 
-        // Function to send a new message
+        // Function to play the message sound
+        function playMessageSound() {
+            const messageSound = document.getElementById('messageSound');
+            messageSound.play();
+        }
+
+        // Function to send a new message for the user
         function sendMessage() {
-            const message = messageInput.value.trim();
-            if (message !== '') {
-                const formattedMessage = `User: ${message}`;
-                displayMessage(formattedMessage);
+            const userMessage = messageInput.value.trim();
+            if (userMessage !== '') {
+                displayMessage(`anon : ${userMessage}`, false);
                 messageInput.value = '';
+
+                // Find a matching response pattern
+                const response = getResponse(userMessage);
+                if (response) {
+                    setTimeout(() => {
+                        displayMessage(`anon: ${response}`, false);
+                        if (isPaused) {
+                            isPaused = false;
+                            setTimeout(() => {
+                                // Generate a random message for the selfbot
+                                const selfMessage = generateRandomMessage();
+                                displayMessage(`anon: ${selfMessage}`, true);
+                            }, 4000); // Pause for 4 seconds
+                        }
+                    }, 1000);
+                }
             }
+        }
+
+        // Function to find a matching response based on patterns
+        function getResponse(message) {
+            for (const { pattern, response, pause } of conversationPatterns) {
+                if (message.match(pattern)) {
+                    if (pause) {
+                        isPaused = true;
+                    }
+                    return response;
+                }
+            }
+            return "..";
+        }
+
+        // Function to generate a random message
+        function generateRandomMessage() {
+            const words = ["apple", "banana", "chocolate", "dog", "elephant", "flower", "guitar", "happy", "ice cream", "jazz"];
+            const randomWord = words[Math.floor(Math.random() * words.length)];
+            return `${randomWord}`;
         }
 
         // Listen for Enter key press to send a message
@@ -38,17 +97,78 @@
             }
         });
 
-        // Simulate receiving messages from other users (for demonstration purposes)
+        // Trigger the getResponse function periodically for the stranger (for demonstration purposes)
         setInterval(function () {
             const messages = [
                 "Hello there!",
-                "How's it going?",
+                "udahlah,ngapain disini ",
+                "T",
+                "APA KABAR WOI",
                 "This is a simple chat example."
             ];
 
             const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-            displayMessage(`Anonymous: ${randomMessage}`);
-        }, 3000); // Simulate a new message every 3 seconds
+            const response = getResponse(randomMessage);
+            displayMessage(`anon: ${response}`, false);
+        }, 4000);
+
+        // Trigger the selfbot to send a message periodically (for demonstration purposes)
+        setInterval(function () {
+            // Generate a random message for the selfbot
+            const selfMessage = generateRandomMessage();
+            displayMessage(`anon: ${selfMessage}`, true);
+        }, 4000); // Simulate a new message every 3 seconds
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Places Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+
+        #map {
+            width: 80%;
+            height: 400px;
+            margin: 20px auto;
+            border: 2px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Random Places Generator</h1>
+    <button id="addPlaceBtn">Add Random Place</button>
+    <div id="map"></div>
+
+    <script>
+        // Initialize an array to store random places
+        const places = [];
+
+        // Function to generate a random place
+        function generateRandomPlace() {
+            const latitude = (Math.random() * 180) - 90;
+            const longitude = (Math.random() * 360) - 180;
+            return { latitude, longitude };
+        }
+
+        // Function to add a random place to the map
+        function addRandomPlace() {
+            const map = document.getElementById('map');
+            const place = generateRandomPlace();
+            places.push(place);
+            map.innerHTML += `<p>Latitude: ${place.latitude.toFixed(2)}, Longitude: ${place.longitude.toFixed(2)}</p>`;
+        }
+
+        // Attach click event to the "Add Random Place" button
+        const addPlaceBtn = document.getElementById('addPlaceBtn');
+        addPlaceBtn.addEventListener('click', addRandomPlace);
     </script>
 </body>
 </html>
