@@ -2,95 +2,59 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <style>
+    #chat-box {
+      overflow-y: scroll;
+      max-height: 200px; /* Limit chat box height for scrolling */
+      border: 1px solid #ccc;
+      padding: 10px;
+      white-space: pre-wrap; /* Preserve line breaks and spaces for copy-pasting */
+    }
+  </style>
+  <style>
+  .centered-text {
+    text-align: center;
+  }
+</style>
 </head>
 <body>
-    <div id="chat">
-        <div id="chat-box"></div>
-        <input type="text" id="message" placeholder="Type your message..." />
-        <button onclick="sendMessage()">Send</button>
+    <div>
+        <div class="centered-text">
+  <h4>logion
+</h4>
+</div>
+        <div id="chat">
+            <div id="chat-box"></div>
+        </div>
+        <audio id="messageSound" src="c.mp3"></audio>
     </div>
-    <audio id="messageSound" src="c.mp3"></audio>
+    <p id="count">Messages: 0</p> <!-- Display message count here -->
+    <p id="length">Total Length: 0</p> <!-- Display total length here -->
     <script>
         const chatBox = document.getElementById('chat-box');
-        const messageInput = document.getElementById('message');
-        let isPaused = false;
+        const messageSound = document.getElementById('messageSound');
+        const countElement = document.getElementById('count'); // Reference to the count element
+        const lengthElement = document.getElementById('length'); // Reference to the length element
 
-        // Conversation patterns and responses for the stranger
-        const conversationPatterns = [
-            { pattern: /hello|hi|hey/i, response: "Hello there!" },
-            { pattern: /how are you|how's it going|what's up/i, response: "I'm good, thanks!" },
-            { pattern: /tell me a joke|joke/i, response: "Why did the chicken cross the road? To get to the other side!" },
-            { pattern: /bye|goodbye|see you/i, response: "Goodbye! Have a great day!" },
-            { pattern: /stop/i, response: "Ok boomer", pause: true },
-            { pattern: /halo/i, response: "hello" }, // Added pattern for "halo"
-            // Add more patterns and responses here
-        ];
+        const customPattern = /bible/i; // Case-insensitive pattern to match "bible"
+        let messageCount = 0;
 
-        // Function to display messages in the chat box and play a sound
-        function displayMessage(message, isSelfbotMessage) {
-            const messageDiv = document.createElement('div');
-            messageDiv.textContent = message;
-            chatBox.appendChild(messageDiv);
-
-            // Play the message sound only if it's not a selfbot message
-            if (!isSelfbotMessage) {
-                playMessageSound();
-            }
-        }
-
-        // Function to play the message sound
-        function playMessageSound() {
-            const messageSound = document.getElementById('messageSound');
-            messageSound.play();
-        }
-
-        // Function to send a new message for the user
-        function sendMessage() {
-            const userMessage = messageInput.value.trim();
-            if (userMessage !== '') {
-                displayMessage(`anon : ${userMessage}`, false);
-                messageInput.value = '';
-
-                // Find a matching response pattern
-                const response = getResponse(userMessage);
-                if (response) {
-                    setTimeout(() => {
-                        displayMessage(`anon: ${response}`, false);
-                        if (isPaused) {
-                            isPaused = false;
-                            setTimeout(() => {
-                                // Generate a random message for the selfbot
-                                const selfMessage = generateRandomMessage();
-                                displayMessage(`anon: ${selfMessage}`, true);
-                            }, 4000); // Pause for 4 seconds
-                        }
-                    }, 1000);
-                }
-            }
-        }
-
-        // Function to find a matching response based on patterns
-        function getResponse(message) {
-            for (const { pattern, response, pause } of conversationPatterns) {
-                if (message.match(pattern)) {
-                    if (pause) {
-                        isPaused = true;
-                    }
-                    return response;
-                }
-            }
-            return "..";
-        }
-
+        // Function to generate a random message
         function generateRandomMessage() {
-            const words = ["apple", "banana", "chocolate", "dog", "elephant", "flower", "guitar", "happy", "ice cream", "jazz"];
+            const words = [
+                "faith",
+                "grace",
+                "salvation",
+                "repentance",
+                "forgiveness"
+                // Add more Bible-based words here
+            ];
+
             const randomIndex = Math.floor(Math.random() * words.length);
             const randomWord = words[randomIndex];
 
             // Determine the probability of each action
-            const scrambleProbability = 0.3; // Probability to scramble
-            const customPatternProbability = 0.4; // Probability to match custom pattern
+            const scrambleProbability = 666; // Probability to scramble
 
             // Generate a random number between 0 and 1
             const randomProbability = Math.random();
@@ -99,7 +63,7 @@
                 // Scramble the word
                 const scrambledWord = scrambleWord(randomWord);
                 return `${scrambledWord}`;
-            } else if (randomProbability < scrambleProbability + customPatternProbability && customPattern.test(randomWord)) {
+            } else if (customPattern.test(randomWord)) {
                 // Check if the word matches the custom pattern
                 return `${randomWord}`;
             } else {
@@ -123,35 +87,30 @@
             return wordArray.join("");
         }
 
-        // Listen for Enter key press to send a message
-        messageInput.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        // Trigger the getResponse function periodically for the stranger (for demonstration purposes)
-        setInterval(function () {
-            const messages = [
-                "Hello there!",
-                "udahlah,ngapain disini ",
-                "T",
-                "APA KABAR WOI",
-                "aaaaaaa"
-            ];
-
-            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-            const response = getResponse(randomMessage);
-            displayMessage(`anon: ${response}`, false);
-        }, 4000);
+        // Function to display a message in the chat box
+        function displayMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+            messageSound.play(); // Play the message sound
+            messageCount++;
+            
+            // Update the message count in the <p> element
+            countElement.textContent = `Messages: ${messageCount}`;
+            
+            // Calculate and display the total length of all messages
+            const allMessages = chatBox.textContent;
+            const totalLength = allMessages.length;
+            lengthElement.textContent = `Total Length: ${totalLength}`;
+        }
 
         // Trigger the selfbot to send a message periodically (for demonstration purposes)
         setInterval(function () {
             // Generate a random message for the selfbot
             const selfMessage = generateRandomMessage();
-            displayMessage(`anon: ${selfMessage}`, true);
-        }, 4000); // Simulate a new message every 4 seconds
+            displayMessage(selfMessage);
+        }, 2000); // Simulate a new message every 4 seconds
     </script>
-
 </body>
 </html>
