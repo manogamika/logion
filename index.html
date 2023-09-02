@@ -1,44 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4chan-Style Chatroom</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
 </head>
 <body>
-    <div class="container mt-4">
-        <div class="jumbotron">
-            <h1 class="display-4">4chan-Style Chatroom</h1>
-            <p class="lead">Join the conversation!</p>
-        </div>
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body">
-                        <div id="chat">
-                            <div id="messages"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-group mt-3">
-                    <input type="text" class="form-control" id="messageInput" placeholder="Type your message">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary" onclick="sendMessage()">Send</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <!-- Add any additional features or widgets here -->
-            </div>
-        </div>
+    <div id="chat">
+        <div id="messages"></div>
+        <input type="text" id="messageInput" placeholder="Type your message">
+        <button onclick="sendMessage()">Send</button>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        // JavaScript for chat functionality goes here
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const serverUrl = 'ws://localhost:8080'; // Replace with your server's URL
+
+        // Create a WebSocket connection to the server
+        const socket = new WebSocket(serverUrl);
+
+        // Handle incoming messages from the server
+        socket.addEventListener('message', (event) => {
+            const message = event.data;
+            messagesDiv.innerHTML += `<p>${message}</p>`;
+        });
+
+        // Function to send a message to the server
+        function sendMessage() {
+            const message = messageInput.value;
+            socket.send(message);
+            messageInput.value = '';
+        }
+    </script>
+
+    <script>
+        const WebSocket = require('ws');
+        const server = new WebSocket.Server({ noServer: true });
+
+        // Handle WebSocket connections
+        server.on('connection', (socket) => {
+            console.log('Client connected');
+
+            // Handle incoming messages from clients
+            socket.on('message', (message) => {
+                console.log(`Received: ${message}`);
+
+                // Broadcast the message to all connected clients (excluding sender)
+                server.clients.forEach((client) => {
+                    if (client !== socket && client.readyState === WebSocket.OPEN) {
+                        client.send(message);
+                    }
+                });
+            });
+
+            // Handle client disconnection
+            socket.on('close', () => {
+                console.log('Client disconnected');
+            });
+        });
+
+        // Attach the WebSocket server to an HTTP server (for demonstration purposes)
+        const http = require('http');
+        const httpServer = http.createServer((req, res) => {
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end('WebSocket server running');
+        });
+
+        httpServer.on('upgrade', (request, socket, head) => {
+            server.handleUpgrade(request, socket, head, (ws) => {
+                server.emit('connection', ws, request);
+            });
+        });
+
+        httpServer.listen(8080, () => {
+            console.log('WebSocket server listening on port 8080');
+        });
     </script>
 </body>
 </html>
