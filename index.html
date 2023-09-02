@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+    <title>Anonymous Chat</title>
 </head>
 <body>
     <div id="chat">
@@ -11,6 +11,9 @@
     </div>
 
     <script>
+        // Create a random ID for the user
+        const userId = Math.random().toString(36).substring(2, 15);
+
         // Array to store chat messages
         const messages = [];
 
@@ -31,7 +34,7 @@
             const message = messageInput.value.trim();
             
             if (message !== '') {
-                messages.push(message);
+                messages.push(`User ${userId}: ${message}`);
                 messageInput.value = '';
                 renderMessages();
             }
