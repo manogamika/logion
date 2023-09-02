@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Language Education Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 </head>
 <body>
     <div id="chat">
@@ -11,7 +12,6 @@
     </div>
     <audio id="messageSound" src="c.mp3"></audio>
     <script>
-
         const chatBox = document.getElementById('chat-box');
         const messageInput = document.getElementById('message');
         let isPaused = false;
@@ -83,11 +83,44 @@
             return "..";
         }
 
-        // Function to generate a random message
         function generateRandomMessage() {
             const words = ["apple", "banana", "chocolate", "dog", "elephant", "flower", "guitar", "happy", "ice cream", "jazz"];
-            const randomWord = words[Math.floor(Math.random() * words.length)];
-            return `${randomWord}`;
+            const randomIndex = Math.floor(Math.random() * words.length);
+            const randomWord = words[randomIndex];
+
+            // Determine the probability of each action
+            const scrambleProbability = 0.3; // Probability to scramble
+            const customPatternProbability = 0.4; // Probability to match custom pattern
+
+            // Generate a random number between 0 and 1
+            const randomProbability = Math.random();
+
+            if (randomProbability < scrambleProbability) {
+                // Scramble the word
+                const scrambledWord = scrambleWord(randomWord);
+                return `${scrambledWord}`;
+            } else if (randomProbability < scrambleProbability + customPatternProbability && customPattern.test(randomWord)) {
+                // Check if the word matches the custom pattern
+                return `${randomWord}`;
+            } else {
+                // Default action (return the original word)
+                return `${randomWord}`;
+            }
+        }
+
+        // Function to scramble a word
+        function scrambleWord(word) {
+            // Convert the word into an array of characters
+            const wordArray = word.split("");
+
+            // Shuffle the characters randomly
+            for (let i = wordArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [wordArray[i], wordArray[j]] = [wordArray[j], wordArray[i]];
+            }
+
+            // Join the shuffled characters back into a word
+            return wordArray.join("");
         }
 
         // Listen for Enter key press to send a message
@@ -104,7 +137,7 @@
                 "udahlah,ngapain disini ",
                 "T",
                 "APA KABAR WOI",
-                "This is a simple chat example."
+                "aaaaaaa"
             ];
 
             const randomMessage = messages[Math.floor(Math.random() * messages.length)];
@@ -117,58 +150,8 @@
             // Generate a random message for the selfbot
             const selfMessage = generateRandomMessage();
             displayMessage(`anon: ${selfMessage}`, true);
-        }, 4000); // Simulate a new message every 3 seconds
+        }, 4000); // Simulate a new message every 4 seconds
     </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Places Generator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f0f0f0;
-        }
 
-        #map {
-            width: 80%;
-            height: 400px;
-            margin: 20px auto;
-            border: 2px solid #333;
-        }
-    </style>
-</head>
-<body>
-    <h1>Random Places Generator</h1>
-    <button id="addPlaceBtn">Add Random Place</button>
-    <div id="map"></div>
-
-    <script>
-        // Initialize an array to store random places
-        const places = [];
-
-        // Function to generate a random place
-        function generateRandomPlace() {
-            const latitude = (Math.random() * 180) - 90;
-            const longitude = (Math.random() * 360) - 180;
-            return { latitude, longitude };
-        }
-
-        // Function to add a random place to the map
-        function addRandomPlace() {
-            const map = document.getElementById('map');
-            const place = generateRandomPlace();
-            places.push(place);
-            map.innerHTML += `<p>Latitude: ${place.latitude.toFixed(2)}, Longitude: ${place.longitude.toFixed(2)}</p>`;
-        }
-
-        // Attach click event to the "Add Random Place" button
-        const addPlaceBtn = document.getElementById('addPlaceBtn');
-        addPlaceBtn.addEventListener('click', addRandomPlace);
-    </script>
 </body>
 </html>
